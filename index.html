@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Você conhece o ciclo da água?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Tela Inicial -->
+    <div id="tela-inicial" class="tela ativa">
+        <h1 class="titulo-jogo">Ciclo da Água</h1>
+        <button id="btn-iniciar" class="btn-iniciar">Iniciar</button>
+    </div>
+
+    <!-- TELA DO JOGO -->
+    <div id="tela-jogo" class="tela">
+        <h2 id="titulo-jogo" class="titulo-etapa"></h2>
+    
+        <div class="pontuacao-container">
+            Pontuação: <span id="pontuacao">0</span>
+        </div>
+
+        <div class="alvos-container">
+            <!-- serão gerados dinamicamente via JS -->
+        </div>
+
+        <div class="blocos-container">
+            <!-- serão gerados dinamicamente via JS -->
+        </div>
+    </div>
+
+    <!-- TELA FINAL -->
+    <div id="tela-final" class="tela">
+        <h2>Parabéns!</h2>
+        <p>Sua pontuação foi: <span id="pontuacao-final">0</span></p>
+        <button id="btn-reiniciar" class="btn-iniciar">Jogar novamente!</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
