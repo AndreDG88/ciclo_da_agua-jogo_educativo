@@ -13,8 +13,14 @@ const blocosContainer = document.querySelector('.blocos-container');
 const pontuacaoSpan = document.getElementById('pontuacao');
 const pontuacaoFinal = document.getElementById('pontuacao-final');
 
+// SONS DE FEEDBACK
+const somAcerto = new Audio('sons/acerto.mp3');
+const somErro = new Audio('sons/erro.mp3');
+
 let pontuacao = 0; // contador de pontos
 let jogoData = null; // dados carregados do JSON
+let tempo = 0; // tempo em segundos
+let intervaloTempo = null;
 
 // INICIAR JOGO
 btnIniciar.addEventListener('click', () => {
@@ -43,6 +49,23 @@ async function carregarJogo() {
     }
 }
 
+// Iniciar e atualizar o temporizador
+function iniciarTemporizador() {
+    tempo = 0;
+    const tempoSpan = document.getElementById('tempo');
+    tempoSpan.textContent = tempo;
+
+    // Atualiza o temporizador a cada segundo
+    intervaloTempo = setInterval(() => {
+        tempo += 1;
+        tempoSpan.textContent = tempo;
+    }, 1000);
+}
+
+function pararTemporizador() {
+    clearInterval(intervaloTempo);
+}
+
 // INICIAR JOGO
 async function iniciarJogo() {
     await carregarJogo();
@@ -54,6 +77,9 @@ async function iniciarJogo() {
     // Criar alvos e blocos arrastáveis
     criarAlvos();
     criarBlocos();
+
+    // Iniciar temporizador
+    iniciarTemporizador();
 }
 
 // CRIAR ALVOS
@@ -63,19 +89,62 @@ function criarAlvos() {
         alvo.classList.add('alvo');
         alvo.textContent = etapa.nome;
 
-        // Permitir drop
-        alvo.addEventListener('dragover', e => e.preventDefault());
-        alvo.addEventListener('drop', e => {
-            const blocoId = e.dataTransfer.getData('text');
-            const bloco = document.getElementById(blocoId);
+    // Permitir drop
+    alvo.addEventListener('dragover', e => e.preventDefault());
 
-            // Apenas mover o bloco para o alvo
+    alvo.addEventListener('drop', e => {
+        const blocoId = e.dataTransfer.getData('text');
+        const bloco = document.getElementById(blocoId);
+
+        // Verificação do acerto
+        const descricaoCorreta = jogoData.etapas.find(item => item.nome === alvo.textContent).descricao;
+
+        if (bloco.textContent === descricaoCorreta) {
+            // ACERTO
             alvo.appendChild(bloco);
             bloco.style.position = 'static';
-        });
+            bloco.classList.add('correto');
+            bloco.setAttribute('draggable', 'false'); // bloqueia movimento
+            pontuacao += 1;
+            pontuacaoSpan.textContent = pontuacao;
 
-        alvosContainer.appendChild(alvo);
+            // Tocar som de acerto
+            somAcerto.currentTime = 0;
+            somAcerto.play();
+        } else {
+            // ERRO
+            bloco.classList.add('errado');
+
+            // Tocar som de erro
+            somErro.currentTime = 0;
+            somErro.play();
+
+            setTimeout(() => {
+                bloco.classList.remove('errado');
+                // Voltar o bloco para o container original
+                blocosContainer.appendChild(bloco);
+                bloco.style.position = 'static';
+            }, 800);
+        }
+
+        // Checagem de conclusão
+        if (pontuacao === jogoData.etapas.length) {
+            setTimeout(finalizarJogo, 500);
+        }
     });
+
+    alvosContainer.appendChild(alvo);
+    });
+}
+
+// FINALIZAR JOGO
+function finalizarJogo() {
+    telaJogo.classList.remove('ativa');
+    telaFinal.classList.add('ativa');
+    pontuacaoFinal.textContent = pontuacao;
+
+    // Parar temporizador
+    pararTemporizador();
 }
 
 // CRIAR BLOCOS ARRASTÁVEIS

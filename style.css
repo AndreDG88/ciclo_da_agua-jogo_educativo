@@ -131,3 +131,27 @@ body {
     font-size: 1.5rem;
     margin-bottom: 20px;
 }
+
+/* Animação de brilho ao acertar */
+@keyframes brilho {
+    0% { box-shadow: 0 0 5px #A5D6A7; }
+    50% { box-shadow: 0 0 20px #A5D6A7; }
+    100% { box-shadow: 0 0 5px #A5D6A7; }
+}
+
+.bloco.correto {
+    animation: brilho 0.5s ease-in-out;
+}
+
+/* Animação de tremer ao errar */
+@keyframes tremer {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}
+
+.bloco.errado {
+    animation: tremer 0.5s;
+}
