@@ -10,20 +10,29 @@
 <body>
     <!-- Tela Inicial -->
     <div id="tela-inicial" class="tela ativa">
-        <h1 class="titulo-jogo">Ciclo da Água</h1>
+        <video autoplay muted loop class="bg-video">
+            <source src="videos/inicial-final.mp4" type="video/mp4">
+            Seu navegador não suporta vídeos em HTML5.
+        </video>
+        <h1 class="titulo-jogo">🌧️ Ciclo da Água</h1>
+        <p class="subtitulo-inicial">Vamos testar o que sabe sobre a água?</p>
         <button id="btn-iniciar" class="btn-iniciar">Iniciar</button>
     </div>
 
     <!-- TELA DO JOGO -->
     <div id="tela-jogo" class="tela">
+        <video autoplay muted loop class="bg-video">
+            <source src="videos/jogo.mp4" type="video/mp4">
+            Seu navegador não suporta vídeos em HTML5.
+        </video>
         <h2 id="titulo-jogo" class="titulo-etapa"></h2>
     
         <div class="pontuacao-container">
-            Pontuação: <span id="pontuacao">0</span>
+            Pontuação 🌟: <span id="pontuacao">0</span>
         </div>
 
         <div class="temporizador">
-            Tempo: <span id="tempo">0</span> segundos
+            Tempo ⏱️: <span id="tempo">60</span> segundos
         </div>
 
         <div class="alvos-container">
@@ -37,8 +46,13 @@
 
     <!-- TELA FINAL -->
     <div id="tela-final" class="tela">
+        <video autoplay muted loop class="bg-video">
+            <source src="videos/inicial-final.mp4" type="video/mp4">
+            Seu navegador não suporta vídeos em HTML5.
+        </video>
         <h2>Parabéns!</h2>
-        <p>Sua pontuação foi: <span id="pontuacao-final">0</span></p>
+        <p>Sua pontuação foi 🌟: <span id="pontuacao-final">0</span></p>
+        <p>Tempo total ⏱️: <span id="tempo-final">0</span> segundos</p>
         <button id="btn-reiniciar" class="btn-iniciar">Jogar novamente!</button>
     </div>
 

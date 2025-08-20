@@ -20,6 +20,7 @@ const somErro = new Audio('sons/erro.mp3');
 let pontuacao = 0; // contador de pontos
 let jogoData = null; // dados carregados do JSON
 let tempo = 0; // tempo em segundos
+let tempoDecorrido = 0;
 let intervaloTempo = null;
 
 // INICIAR JOGO
@@ -51,19 +52,42 @@ async function carregarJogo() {
 
 // Iniciar e atualizar o temporizador
 function iniciarTemporizador() {
-    tempo = 0;
+    let tempoRestante = 60;
+    tempoDecorrido = 0;
     const tempoSpan = document.getElementById('tempo');
-    tempoSpan.textContent = tempo;
+    if (!tempoSpan) return;
+    tempoSpan.textContent = tempoRestante;
 
     // Atualiza o temporizador a cada segundo
     intervaloTempo = setInterval(() => {
-        tempo += 1;
-        tempoSpan.textContent = tempo;
+        tempoRestante -= 1;
+        tempoDecorrido += 1;
+        tempoSpan.textContent = tempoRestante;
+
+        // Quando o tempo acabar, finaliza o jogo
+        if (tempoRestante <= 0) {
+            clearInterval(intervaloTempo);
+            exibirTempoEsgotado();
+        }
     }, 1000);
 }
 
 function pararTemporizador() {
     clearInterval(intervaloTempo);
+}
+
+// Exibir mensagem de tempo esgotado
+function exibirTempoEsgotado() {
+    pararTemporizador();
+
+    telaJogo.classList.remove('ativa');
+    telaFinal.classList.add('ativa');
+    pontuacaoFinal.textContent = pontuacao;
+    document.getElementById('tempo-final').textContent = tempoDecorrido;
+
+    // Altera título para mensagem de tempo esgotado
+    const tituloFinal = telaFinal.querySelector('h2');
+    tituloFinal.textContent = "⏰ Tempo esgotado!";
 }
 
 // INICIAR JOGO
@@ -84,48 +108,75 @@ async function iniciarJogo() {
 
 // CRIAR ALVOS
 function criarAlvos() {
-    jogoData.etapas.forEach(etapa => {
+    // Limpa o container antes de criar
+    alvosContainer.innerHTML = '';
+
+    jogoData.etapas.forEach((etapa, index) => {
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('pergunta');
+
         const alvo = document.createElement('div');
         alvo.classList.add('alvo');
         alvo.textContent = etapa.nome;
+
+        alvo.dataset.index = index;
 
     // Permitir drop
     alvo.addEventListener('dragover', e => e.preventDefault());
 
     alvo.addEventListener('drop', e => {
+        e.preventDefault();
         const blocoId = e.dataTransfer.getData('text');
         const bloco = document.getElementById(blocoId);
 
-        // Verificação do acerto
-        const descricaoCorreta = jogoData.etapas.find(item => item.nome === alvo.textContent).descricao;
+        // Se bloco não existir, aborta
+        if (!bloco) return;
 
-        if (bloco.textContent === descricaoCorreta) {
+        // Verificação do acerto
+        if (bloco.dataset.index === alvo.dataset.index) {
             // ACERTO
-            alvo.appendChild(bloco);
-            bloco.style.position = 'static';
+            let slot = alvo.nextElementSibling;
+            if (!slot || !slot.classList.contains('slot-resposta')) {
+                slot = document.createElement('div');
+                slot.classList.add('slot-resposta');
+                alvo.insertAdjacentElement('afterend', slot);
+            }
+
+            // Coloca o bloco dentro do slot (assim ele ficará sempre abaixo do alvo)
+            slot.appendChild(bloco);
+
+            bloco.setAttribute('draggable', 'false');
             bloco.classList.add('correto');
-            bloco.setAttribute('draggable', 'false'); // bloqueia movimento
+            bloco.style.transform = ''; // remove possíveis transform de drag
+
+            // Atualiza pontuação
             pontuacao += 1;
             pontuacaoSpan.textContent = pontuacao;
 
             // Tocar som de acerto
-            somAcerto.currentTime = 0;
-            somAcerto.play();
+            try {
+                somAcerto.currentTime = 0;
+                somAcerto.play();
+            } catch (err) {
+                // se houver falha no som, não trava o jogo
+            }
         } else {
-            // ERRO
+            // ERRO: feedback visual + som
             bloco.classList.add('errado');
+            try {
+                somErro.currentTime = 0;
+                somErro.play();
+            } catch (err) {}
 
-            // Tocar som de erro
-            somErro.currentTime = 0;
-            somErro.play();
-
-            setTimeout(() => {
-                bloco.classList.remove('errado');
-                // Voltar o bloco para o container original
-                blocosContainer.appendChild(bloco);
-                bloco.style.position = 'static';
-            }, 800);
-        }
+                setTimeout(() => {
+                    bloco.classList.remove('errado');
+                    // Voltar o bloco para o container original (se já não estiver lá)
+                    if (!blocosContainer.contains(bloco)) {
+                        blocosContainer.appendChild(bloco);
+                        bloco.style.transform = '';
+                    }
+                }, 800);
+            }
 
         // Checagem de conclusão
         if (pontuacao === jogoData.etapas.length) {
@@ -133,7 +184,8 @@ function criarAlvos() {
         }
     });
 
-    alvosContainer.appendChild(alvo);
+        wrapper.appendChild(alvo);
+        alvosContainer.appendChild(wrapper);
     });
 }
 
@@ -142,9 +194,13 @@ function finalizarJogo() {
     telaJogo.classList.remove('ativa');
     telaFinal.classList.add('ativa');
     pontuacaoFinal.textContent = pontuacao;
+    document.getElementById('tempo-final').textContent = tempoDecorrido;
 
     // Parar temporizador
     pararTemporizador();
+
+    const tituloFinal = telaFinal.querySelector('h2');
+    tituloFinal.textContent = "🎉 Parabéns! Você concluiu o jogo!";
 }
 
 // CRIAR BLOCOS ARRASTÁVEIS
@@ -155,6 +211,8 @@ function criarBlocos() {
         bloco.setAttribute('draggable', 'true');
         bloco.id = `bloco-${index}`;
         bloco.textContent = etapa.descricao;
+
+        bloco.dataset.index = String(index);
 
         // Evento de drag
         bloco.addEventListener('dragstart', e => {
