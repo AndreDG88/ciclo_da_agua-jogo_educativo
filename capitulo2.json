@@ -1,0 +1,21 @@
+{
+    "titulo": "Capítulo 2 - Importância da Água",
+    "etapas": [
+        {
+            "nome": "Consumo Humano",
+            "descricao": "Qual é o uso da água essencial para a sobrevivência das pessoas?"
+        },
+        {
+            "nome": "Agricultura",
+            "descricao": "Em qual atividade a água é usada principalmente para irrigar plantas e cultivar alimentos?"
+        },
+        {
+            "nome": "Indústria",
+            "descricao": "Qual setor utiliza a água para refrigeração, limpeza e processos de produção?"
+        },
+        {
+            "nome": "Energia",
+            "descricao": "Qual tipo de usina usa a força da água para gerar eletricidade?"
+        }
+    ]
+}

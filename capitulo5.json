@@ -1,0 +1,21 @@
+{
+    "titulo": "Capítulo 5 - Preservação da Água",
+    "etapas": [
+        {
+            "nome": "Economia",
+            "descricao": "Fechar a torneira ao escovar os dentes é um exemplo de que prática?"
+        },
+        {
+            "nome": "Reuso",
+            "descricao": "Qual prática permite aproveitar a água da chuva para regar plantas ou lavar calçadas?"
+        },
+        {
+            "nome": "Tratamento",
+            "descricao": "Antes de ser consumida, a água usada nas cidades passa por qual processo?"
+        },
+        {
+            "nome": "Consciência",
+            "descricao": "Campanhas de educação ambiental ajudam a reduzir o desperdício de água. Qual valor isso promove?"
+        }
+    ]
+}

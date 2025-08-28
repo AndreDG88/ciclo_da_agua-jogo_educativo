@@ -1,0 +1,21 @@
+{
+    "titulo": "Capítulo 3 - O Ciclo da Água",
+    "etapas": [
+        {
+            "nome": "Evaporação",
+            "descricao": "Quando a água aquece e se transforma em vapor subindo para a atmosfera, qual é o processo?"
+        },
+        {
+            "nome": "Condensação",
+            "descricao": "Quando o vapor de água esfria e forma nuvens, como chamamos esse fenômeno?"
+        },
+        {
+            "nome": "Precipitação",
+            "descricao": "Qual processo devolve água à superfície da Terra em forma de chuva, neve ou granizo?"
+        },
+        {
+            "nome": "Infiltração",
+            "descricao": "Quando a água da chuva penetra no solo e abastece lençóis freáticos, como chamamos isso?"
+        }
+    ]
+}

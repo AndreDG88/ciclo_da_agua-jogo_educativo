@@ -3,57 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Você conhece o ciclo da água?</title>
+    <title>🌧️ Desafio do Ciclo da Água</title>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Vídeo de fundo -->
+    <video autoplay muted loop class="bg-video">
+        <source src="videos/inicial-final.mp4" type="video/mp4">
+        Seu navegador não suporta vídeos em HTML5.
+    </video>
+
+    <div class="overlay"></div>
+
     <!-- Tela Inicial -->
     <div id="tela-inicial" class="tela ativa">
-        <video autoplay muted loop class="bg-video">
-            <source src="videos/inicial-final.mp4" type="video/mp4">
-            Seu navegador não suporta vídeos em HTML5.
-        </video>
-        <h1 class="titulo-jogo">🌧️ Ciclo da Água</h1>
-        <p class="subtitulo-inicial">Vamos testar o que sabe sobre a água?</p>
-        <button id="btn-iniciar" class="btn-iniciar">Iniciar</button>
+        <h1>🌧️ Desafio do Ciclo da Água</h1>
+        <p>
+            Vamos testar o que sabe sobre a água 💧?<br>
+            Responda o maior número de perguntas antes que o tempo acabe.<br>
+            ⏱️ Você tem 90 segundos!
+        </p>
+        <button id="btn-iniciar" class="btn-iniciar">Começar!</button>
     </div>
 
     <!-- TELA DO JOGO -->
     <div id="tela-jogo" class="tela">
-        <video autoplay muted loop class="bg-video">
-            <source src="videos/jogo.mp4" type="video/mp4">
-            Seu navegador não suporta vídeos em HTML5.
-        </video>
-        <h2 id="titulo-jogo" class="titulo-etapa"></h2>
-    
-        <div class="pontuacao-container">
-            Pontuação 🌟: <span id="pontuacao">0</span>
+        <div class="hud">
+            <span>⏱️ Tempo: <span id="tempo">90</span>s</span>
+            <span>⭐ Pontos: <span id="pontuacao">0</span></span>
         </div>
 
-        <div class="temporizador">
-            Tempo ⏱️: <span id="tempo">60</span> segundos
-        </div>
-
-        <div class="alvos-container">
-            <!-- serão gerados dinamicamente via JS -->
-        </div>
-
-        <div class="blocos-container">
-            <!-- serão gerados dinamicamente via JS -->
-        </div>
+        <div id="pergunta" class="pergunta-texto"></div>
+        <div id="opcoes" class="opcoes-container"></div>
     </div>
 
-    <!-- TELA FINAL -->
+    <!-- Tela Final -->
     <div id="tela-final" class="tela">
-        <video autoplay muted loop class="bg-video">
-            <source src="videos/inicial-final.mp4" type="video/mp4">
-            Seu navegador não suporta vídeos em HTML5.
-        </video>
-        <h2>Parabéns!</h2>
-        <p>Sua pontuação foi 🌟: <span id="pontuacao-final">0</span></p>
-        <p>Tempo total ⏱️: <span id="tempo-final">0</span> segundos</p>
-        <button id="btn-reiniciar" class="btn-iniciar">Jogar novamente!</button>
+        <h2>Fim do Jogo!</h2>
+        <p>Você fez ⭐ <span id="pontuacao-final">0</span> pontos!<br>
+        Seu tempo foi de ⏱️ <span id="tempo-final">90</span> segundos!</p>
+        <button id="btn-reiniciar">Jogar Novamente</button>
     </div>
 
     <script src="script.js"></script>

@@ -1,0 +1,21 @@
+{
+    "titulo": "Capítulo 4 - Poluição da Água",
+    "etapas": [
+        {
+            "nome": "Lixo",
+            "descricao": "Qual é uma das principais causas de poluição da água causada por resíduos descartados incorretamente?"
+        },
+        {
+            "nome": "Produtos Químicos",
+            "descricao": "Quais substâncias podem contaminar a água potável quando usadas na indústria ou em casa?"
+        },
+        {
+            "nome": "Esgoto",
+            "descricao": "O lançamento de qual tipo de material sem tratamento prejudica a qualidade da água?"
+        },
+        {
+            "nome": "Pesticidas",
+            "descricao": "Que produtos usados na agricultura podem infiltrar no solo e contaminar os lençóis freáticos?"
+        }
+    ]
+}

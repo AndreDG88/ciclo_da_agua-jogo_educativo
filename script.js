@@ -6,219 +6,166 @@ const telaFinal = document.getElementById('tela-final');
 const btnIniciar = document.getElementById('btn-iniciar');
 const btnReiniciar = document.getElementById('btn-reiniciar');
 
-const tituloJogo = document.getElementById('titulo-jogo');
-const alvosContainer = document.querySelector('.alvos-container');
-const blocosContainer = document.querySelector('.blocos-container');
-
 const pontuacaoSpan = document.getElementById('pontuacao');
 const pontuacaoFinal = document.getElementById('pontuacao-final');
+const tempoSpan = document.getElementById('tempo');
 
 // SONS DE FEEDBACK
 const somAcerto = new Audio('sons/acerto.mp3');
 const somErro = new Audio('sons/erro.mp3');
 
+let todasEtapas = []; // irá armazenar todas as perguntas de todos os capítulos
+let etapaAtual = 0; // Índice da pergunta atual
 let pontuacao = 0; // contador de pontos
-let jogoData = null; // dados carregados do JSON
-let tempo = 0; // tempo em segundos
-let tempoDecorrido = 0;
-let intervaloTempo = null;
+let tempoRestante = 90;
+let timer = null;
 
 // INICIAR JOGO
 btnIniciar.addEventListener('click', () => {
-    telaInicial.classList.remove('ativa');
-    telaJogo.classList.add('ativa');
-    iniciarJogo();
+    carregarTodosCapitulos(); // inicia o jogo
 });
 
 btnReiniciar.addEventListener('click', () => {
-    // Resetar pontuação e telas
+    // Resetar o jogo
+    todasEtapas = [];
+    etapaAtual = 0;
     pontuacao = 0;
+    tempoRestante = 90;
+
     pontuacaoSpan.textContent = pontuacao;
-    alvosContainer.innerHTML = '';
-    blocosContainer.innerHTML = '';
+
     telaFinal.classList.remove('ativa');
     telaInicial.classList.add('ativa');
 });
 
-// CARREGAR JSON DO JOGO
-async function carregarJogo() {
+// CARREGAR TODOS OS CAPÍTULOS
+async function carregarTodosCapitulos() {
+    // Lista dos arquivos JSON dos capítulos
+    const capitulos = [
+        "capitulo1.json",
+        "capitulo2.json",
+        "capitulo3.json",
+        "capitulo4.json",
+        "capitulo5.json"
+    ];
+
     try {
-        const response = await fetch('jogo.json');
-        jogoData = await response.json();
+        for (let cap of capitulos) {
+            const response = await fetch(cap);
+            const data = await response.json();
+            todasEtapas = todasEtapas.concat(data.etapas); // Une todas as etapas
+        }
+
+        //Após carredar os capitulos, inicia o jogo
+        iniciarJogo();
+
     } catch (error) {
         console.error('Erro ao carregar o jogo:', error);
     }
 }
 
-// Iniciar e atualizar o temporizador
-function iniciarTemporizador() {
-    let tempoRestante = 60;
-    tempoDecorrido = 0;
-    const tempoSpan = document.getElementById('tempo');
-    if (!tempoSpan) return;
-    tempoSpan.textContent = tempoRestante;
+// FUNÇÃO INICIAR JOGO
+function iniciarJogo() {
+    // Esconde tela inicial e mostra tela de jogo
+    telaInicial.classList.remove('ativa');
+    telaJogo.classList.add('ativa');
 
-    // Atualiza o temporizador a cada segundo
-    intervaloTempo = setInterval(() => {
-        tempoRestante -= 1;
-        tempoDecorrido += 1;
+    etapaAtual = 0;
+    pontuacao = 0;
+    tempoRestante = 90;
+    atualizarPontuacao();
+
+    // Inicia temporizador
+    tempoSpan.textContent = tempoRestante;
+    timer = setInterval(() => {
+        tempoRestante--;
         tempoSpan.textContent = tempoRestante;
 
-        // Quando o tempo acabar, finaliza o jogo
         if (tempoRestante <= 0) {
-            clearInterval(intervaloTempo);
-            exibirTempoEsgotado();
+            clearInterval(timer);
+            finalizarJogo();
         }
     }, 1000);
+
+    // Mostra primeira pergunta
+    mostrarEtapa();
 }
 
-function pararTemporizador() {
-    clearInterval(intervaloTempo);
-}
+// FUNÇÃO MOSTRAR ETAPA ATUAL
+function mostrarEtapa() {
+    if (etapaAtual >= todasEtapas.length) {
+        etapaAtual = 0; // Se acabar todas perguntas, reinicia lista
+    }
 
-// Exibir mensagem de tempo esgotado
-function exibirTempoEsgotado() {
-    pararTemporizador();
+    const etapa = todasEtapas[etapaAtual];
 
-    telaJogo.classList.remove('ativa');
-    telaFinal.classList.add('ativa');
-    pontuacaoFinal.textContent = pontuacao;
-    document.getElementById('tempo-final').textContent = tempoDecorrido;
+    // Cria container de pergunta e opções
+    const perguntaContainer = document.getElementById('pergunta');
+    const opcoesContainer = document.getElementById('opcoes');
 
-    // Altera título para mensagem de tempo esgotado
-    const tituloFinal = telaFinal.querySelector('h2');
-    tituloFinal.textContent = "⏰ Tempo esgotado!";
-}
+    perguntaContainer.textContent = etapa.descricao;
 
-// INICIAR JOGO
-async function iniciarJogo() {
-    await carregarJogo();
-    if (!jogoData) return;
+    // Criar opções embaralhadas (3 aleatórias + 1 correta)
+    let opcoes = todasEtapas.map(e => e.nome); // pega todos os nomes
+    opcoes = opcoes.sort(() => Math.random() - 0.5).slice(0, 3);
 
-    // Atualizar título dinamicamente
-    tituloJogo.textContent = jogoData.titulo;
+    // Garante que a opção correta esteja presente
+    if (!opcoes.includes(etapa.nome)) {
+        opcoes[Math.floor(Math.random() * 3)] = etapa.nome;
+    }
 
-    // Criar alvos e blocos arrastáveis
-    criarAlvos();
-    criarBlocos();
+    // Limpa opções anteriores
+    opcoesContainer.innerHTML = "";
 
-    // Iniciar temporizador
-    iniciarTemporizador();
-}
-
-// CRIAR ALVOS
-function criarAlvos() {
-    // Limpa o container antes de criar
-    alvosContainer.innerHTML = '';
-
-    jogoData.etapas.forEach((etapa, index) => {
-        const wrapper = document.createElement('div');
-        wrapper.classList.add('pergunta');
-
-        const alvo = document.createElement('div');
-        alvo.classList.add('alvo');
-        alvo.textContent = etapa.nome;
-
-        alvo.dataset.index = index;
-
-    // Permitir drop
-    alvo.addEventListener('dragover', e => e.preventDefault());
-
-    alvo.addEventListener('drop', e => {
-        e.preventDefault();
-        const blocoId = e.dataTransfer.getData('text');
-        const bloco = document.getElementById(blocoId);
-
-        // Se bloco não existir, aborta
-        if (!bloco) return;
-
-        // Verificação do acerto
-        if (bloco.dataset.index === alvo.dataset.index) {
-            // ACERTO
-            let slot = alvo.nextElementSibling;
-            if (!slot || !slot.classList.contains('slot-resposta')) {
-                slot = document.createElement('div');
-                slot.classList.add('slot-resposta');
-                alvo.insertAdjacentElement('afterend', slot);
-            }
-
-            // Coloca o bloco dentro do slot (assim ele ficará sempre abaixo do alvo)
-            slot.appendChild(bloco);
-
-            bloco.setAttribute('draggable', 'false');
-            bloco.classList.add('correto');
-            bloco.style.transform = ''; // remove possíveis transform de drag
-
-            // Atualiza pontuação
-            pontuacao += 1;
-            pontuacaoSpan.textContent = pontuacao;
-
-            // Tocar som de acerto
-            try {
-                somAcerto.currentTime = 0;
-                somAcerto.play();
-            } catch (err) {
-                // se houver falha no som, não trava o jogo
-            }
-        } else {
-            // ERRO: feedback visual + som
-            bloco.classList.add('errado');
-            try {
-                somErro.currentTime = 0;
-                somErro.play();
-            } catch (err) {}
-
-                setTimeout(() => {
-                    bloco.classList.remove('errado');
-                    // Voltar o bloco para o container original (se já não estiver lá)
-                    if (!blocosContainer.contains(bloco)) {
-                        blocosContainer.appendChild(bloco);
-                        bloco.style.transform = '';
-                    }
-                }, 800);
-            }
-
-        // Checagem de conclusão
-        if (pontuacao === jogoData.etapas.length) {
-            setTimeout(finalizarJogo, 500);
-        }
-    });
-
-        wrapper.appendChild(alvo);
-        alvosContainer.appendChild(wrapper);
+    opcoes.forEach(op => {
+        const btn = document.createElement('button');
+        btn.textContent = op;
+        btn.classList.add('btn-opcao'); // você pode estilizar no CSS
+        btn.addEventListener('click', () => verificarResposta(btn, op, etapa.nome));
+        opcoesContainer.appendChild(btn);
     });
 }
 
-// FINALIZAR JOGO
-function finalizarJogo() {
-    telaJogo.classList.remove('ativa');
-    telaFinal.classList.add('ativa');
-    pontuacaoFinal.textContent = pontuacao;
-    document.getElementById('tempo-final').textContent = tempoDecorrido;
+// FUNÇÃO VERIFICAR RESPOSTA
+function verificarResposta(botao, resposta, correta) {
+    const botoes = document.querySelectorAll('.btn-opcao');
 
-    // Parar temporizador
-    pararTemporizador();
+    botoes.forEach(b => b.disabled = true);
 
-    const tituloFinal = telaFinal.querySelector('h2');
-    tituloFinal.textContent = "🎉 Parabéns! Você concluiu o jogo!";
-}
-
-// CRIAR BLOCOS ARRASTÁVEIS
-function criarBlocos() {
-    jogoData.etapas.forEach((etapa, index) => {
-        const bloco = document.createElement('div');
-        bloco.classList.add('bloco');
-        bloco.setAttribute('draggable', 'true');
-        bloco.id = `bloco-${index}`;
-        bloco.textContent = etapa.descricao;
-
-        bloco.dataset.index = String(index);
-
-        // Evento de drag
-        bloco.addEventListener('dragstart', e => {
-            e.dataTransfer.setData('text', bloco.id);
+    if (resposta === correta) {
+        pontuacao++;
+        botao.classList.add('correto');
+        try { somAcerto.currentTime = 0; somAcerto.play(); } catch(e){}
+    } else {
+        botao.classList.add('incorreto');
+        botoes.forEach(b => {
+            if (b.textContent === correta) {
+                b.classList.add('correto');
+            }
         });
+        try { somErro.currentTime = 0; somErro.play(); } catch(e){}
+    }
 
-        blocosContainer.appendChild(bloco);
-    });
+    atualizarPontuacao();
+
+    setTimeout(() => {
+        etapaAtual++;
+        mostrarEtapa();
+    }, 1000); // passa para próxima pergunta
+}
+
+// ATUALIZA PONTUAÇÃO NA TELA
+function atualizarPontuacao() {
+    pontuacaoSpan.textContent = pontuacao;
+}
+
+// FINALIZAÇÃO DO JOGO
+function finalizarJogo() {
+    clearInterval(timer);
+
+    telaJogo.classList.remove('ativa');
+    telaFinal.classList.add('ativa');
+
+    pontuacaoFinal.textContent = pontuacao;
+    document.getElementById('tempo-final').textContent = 90; // tempo total de jogo
 }

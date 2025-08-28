@@ -1,0 +1,22 @@
+{
+    "titulo": "Capítulo 1 - Estados Físicos da Água",
+    "etapas": [
+        {
+            "nome": "Sólido",
+            "descricao": "Quando a água congela, qual é o estado em que ela se encontra?"
+        },
+        {
+            "nome": "Líquido",
+            "descricao": "Em rios, lagos e oceanos, a água geralmente está em qual estado?"
+        },
+        {
+            "nome": "Gasoso",
+            "descricao": "Quando a água se transforma em vapor invisível, qual estado é esse?"
+        },
+        {
+            "nome": "Mudança de estado",
+            "descricao": "O que chamamos quando a água passa de sólido para líquido ou de líquido para gás?"
+        }
+    ]
+}
+
